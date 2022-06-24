@@ -8,13 +8,16 @@ import tkinter
 import PIL.Image
 import PIL.ImageTk
 from multiprocessing.pool import ThreadPool
+from gtts import gTTS
+from playsound import playsound
+import os
 
 
 class GUI(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.parent = parent
-        self.core = TrafficSignDetection(out_file='vid.avi', path_to_weight='./models/TSR.pt')
+        self.core = TrafficSignDetection(out_file='vid.avi', path_to_weight='./models/TSR.pt', cam_mode=1)
 
         # Variables
         self.camera_image = None
@@ -36,7 +39,7 @@ class GUI(Frame):
 
         # Window
         self.parent.title("Traffic Sign Recognition")
-        self.parent.geometry("400x400")
+        self.parent.geometry("400x500")
 
         # Camera view
         canvas_w = self.core.camera.get(cv2.CAP_PROP_FRAME_WIDTH) // 2
@@ -53,7 +56,7 @@ class GUI(Frame):
         self.button_stop.pack(side='right', anchor='w', expand=True, pady=(0, 20))
 
         # Label
-        self.lblResults = Label(windows, text="No traffic sign detected.", foreground='red')
+        self.lblResults = Label(windows, text="Không phát hiện biển báo", foreground='red')
         self.lblResults.pack(side='bottom', anchor='s', expand=True, pady=(0, 20))
 
     def start_camera(self):
@@ -66,16 +69,23 @@ class GUI(Frame):
         frame, results = async_result.get()
 
         # Change labels
-        labels, _ = results
-        labels = [self.ts_labels[self.core.class_to_label(labels[i])] for i in range(len(labels))]
+        label_keys, _ = results
+        label_keys = list(set([self.core.class_to_label(label_keys[i]) for i in range(len(label_keys))]))
+        labels = [self.ts_labels[label_keys[i]] for i in range(len(label_keys))]
         if len(labels) > 1:
             label = '\n'.join(labels)
+            if self.lblResults['text'] != label:
+                for i in range(len(label_keys)):
+                    self.speech(label_keys[i])
         elif len(labels) == 1:
             label = labels[0]
+            if self.lblResults['text'] != label:
+                self.speech(label_keys[0])
         else:
-            label = 'No traffic sign detected.'
+            label = 'Không phát hiện biển báo'
+            if self.lblResults['text'] != label:
+                self.speech()
         self.lblResults['text'] = label
-
 
         # Show camera
         self.camera_image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
@@ -99,6 +109,18 @@ class GUI(Frame):
         if self.after_id:
             self.parent.after_cancel(self.after_id)
             self.camera_canvas.delete("all")
+
+    def speech(self, key=None):
+        if key:
+            if not os.path.exists("sounds/"+key+".mp3"):
+                tts = gTTS(self.ts_labels[key], tld="com.vn", lang="vi")
+                tts.save("%s.mp3" % os.path.join("sounds", key))
+            playsound("sounds/"+key+".mp3")
+        else:
+            if not os.path.exists("sounds/default.mp3"):
+                tts = gTTS('Không phát hiện biển báo', tld="com.vn", lang="vi")
+                tts.save("%s.mp3" % os.path.join("sounds", "default"))
+            playsound("sounds/default.mp3")
 
 
 # Start app GUI

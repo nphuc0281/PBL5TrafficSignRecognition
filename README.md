@@ -21,3 +21,9 @@ env\Scripts\deactivate
 ```
 pip install -r requirements.txt
 ```
+
+**Run on Jetson Nano in advanced:**
+```
+source ~/.bashrc
+export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
+```
