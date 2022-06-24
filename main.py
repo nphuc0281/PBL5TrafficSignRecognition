@@ -38,6 +38,7 @@ class GUI(Frame):
         # Window
         self.parent.title("Traffic Sign Recognition")
         self.parent.geometry("1300x800")
+        self.parent.state('zoomed')
 
         # Camera view
         canvas_w = self.core.camera.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -46,17 +47,16 @@ class GUI(Frame):
         self.camera_canvas.pack(side='top', expand=True)
 
         # Label
-        self.lblResults = Label(windows, text="Không phát hiện biển báo", foreground='red', font=("Arial", 20))
+        self.lblResults = Label(windows, text="Không phát hiện biển báo", foreground='red', font=("Roboto", 20))
         self.lblResults.pack(side='top', anchor='n', expand=True)
 
         # Button start camera
         self.button_start = Button(windows, text="Start", command=self.start_camera)
-        self.button_start.pack(side='left', anchor='e', expand=True, pady=(0, 20), padx=(0, 20))
+        self.button_start.pack(side='left', anchor='e', expand=True, pady=(0, 150), padx=(0, 20))
 
         # Button stop camera
         self.button_stop = Button(windows, text="Stop", command=self.stop_camera)
-        self.button_stop.pack(side='right', anchor='w', expand=True, pady=(0, 20), padx=(20, 0))
-
+        self.button_stop.pack(side='right', anchor='w', expand=True, pady=(0, 150), padx=(20, 0))
 
     def start_camera(self):
         # Read from camera
