@@ -17,7 +17,7 @@ class GUI(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.parent = parent
-        self.core = TrafficSignDetection(out_file='vid.avi', path_to_weight='./models/TSR.pt', cam_mode=1)
+        self.core = TrafficSignDetection(out_file='vid.avi', path_to_weight='./models/TSR.pt')
 
         # Variables
         self.camera_image = None
@@ -62,8 +62,7 @@ class GUI(Frame):
     def start_camera(self):
         # Read from camera
         _, frame = self.core.camera.read()
-        height, width, _ = frame.shape
-        frame = cv2.resize(frame, (width // 2, height // 2))
+
         # Processing frame with YOLOv5 model and labeling
         pool = ThreadPool(processes=1)
         async_result = pool.apply_async(self.recognition_process, (frame, ))  # tuple of args for foo
@@ -93,6 +92,8 @@ class GUI(Frame):
         self.after_id = self.parent.after(100, self.start_camera)
 
     def recognition_process(self, frame):
+        height, width, _ = frame.shape
+        frame = cv2.resize(frame, (width // 2, height // 2))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.core.score_frame(frame)
         frame = self.core.plot_boxes(results, frame)
