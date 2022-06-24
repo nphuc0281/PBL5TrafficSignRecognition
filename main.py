@@ -1,6 +1,4 @@
 from TSR import TrafficSignDetection
-from time import time
-import numpy as np
 import cv2
 from tkinter import *
 from tkinter.ttk import *
@@ -10,6 +8,7 @@ import PIL.ImageTk
 from multiprocessing.pool import ThreadPool
 from gtts import gTTS
 from playsound import playsound
+from threading import Thread
 import os
 
 
@@ -17,7 +16,7 @@ class GUI(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.parent = parent
-        self.core = TrafficSignDetection(out_file='vid.avi', path_to_weight='./models/TSR.pt')
+        self.core = TrafficSignDetection(out_file='vid.avi', path_to_weight='./models/TSR.pt', cam_mode=1)
 
         # Variables
         self.camera_image = None
@@ -75,12 +74,15 @@ class GUI(Frame):
         if len(labels) > 1:
             label = '\n'.join(labels)
             if self.lblResults['text'] != label:
-                for i in range(len(label_keys)):
-                    self.speech(label_keys[i])
+                thread = Thread(target=self.speech, args=(label_keys, True))
+                thread.start()
+                thread.join()
         elif len(labels) == 1:
             label = labels[0]
             if self.lblResults['text'] != label:
-                self.speech(label_keys[0])
+                thread = Thread(target=self.speech, args=(label_keys[0],))
+                thread.start()
+                thread.join()
         else:
             label = 'Không phát hiện biển báo'
 
@@ -89,7 +91,7 @@ class GUI(Frame):
         # Show camera
         self.camera_image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
         self.camera_canvas.create_image(0, 0, image=self.camera_image, anchor=tkinter.NW)
-        self.after_id = self.parent.after(100, self.start_camera)
+        self.after_id = self.parent.after(50, self.start_camera)
 
     def recognition_process(self, frame):
         height, width, _ = frame.shape
@@ -104,19 +106,21 @@ class GUI(Frame):
             self.parent.after_cancel(self.after_id)
             self.camera_canvas.delete("all")
 
-    def speech(self, key):
-        if not os.path.exists("sounds/"+key+".mp3"):
-            tts = gTTS(self.ts_labels[key], tld="com.vn", lang="vi")
-            tts.save("%s.mp3" % os.path.join("sounds", key))
-        playsound("sounds/"+key+".mp3")
+    def speech(self, key, many=False):
+        if many:
+            for k in key:
+                if not os.path.exists("sounds/"+k+".mp3"):
+                    tts = gTTS(self.ts_labels[k], tld="com.vn", lang="vi")
+                    tts.save("%s.mp3" % os.path.join("sounds", k))
+                playsound("sounds/"+k+".mp3")
+        else:
+            if not os.path.exists("sounds/" + key + ".mp3"):
+                tts = gTTS(self.ts_labels[key], tld="com.vn", lang="vi")
+                tts.save("%s.mp3" % os.path.join("sounds", key))
+            playsound("sounds/" + key + ".mp3")
 
 
 # Start app GUI
 windows = Tk()
 app = GUI(windows)
 windows.mainloop()
-
-
-
-
-
