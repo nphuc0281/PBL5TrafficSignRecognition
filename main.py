@@ -56,7 +56,7 @@ class GUI(Frame):
         self.button_stop.pack(side='right', anchor='w', expand=True, pady=(0, 20))
 
         # Label
-        self.lblResults = Label(windows, text="Không phát hiện biển báo", foreground='red', font=("Arial", 36))
+        self.lblResults = Label(windows, text="Không phát hiện biển báo", foreground='red')
         self.lblResults.pack(side='bottom', anchor='s', expand=True, pady=(0, 20))
 
     def start_camera(self):
@@ -92,7 +92,7 @@ class GUI(Frame):
         # Show camera
         self.camera_image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
         self.camera_canvas.create_image(0, 0, image=self.camera_image, anchor=tkinter.NW)
-        self.after_id = self.parent.after(200, self.start_camera)
+        self.after_id = self.parent.after(80, self.start_camera)
 
     def recognition_process(self, frame):
         height, width, _ = frame.shape
