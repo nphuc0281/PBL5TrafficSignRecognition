@@ -42,8 +42,8 @@ class GUI(Frame):
         self.parent.geometry("800x1000")
 
         # Camera view
-        canvas_w = self.core.camera.get(cv2.CAP_PROP_FRAME_WIDTH)
-        canvas_h = self.core.camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        canvas_w = self.core.camera.get(cv2.CAP_PROP_FRAME_WIDTH) // 2
+        canvas_h = self.core.camera.get(cv2.CAP_PROP_FRAME_HEIGHT) // 2
         self.camera_canvas = Canvas(self.parent, width=canvas_w, height=canvas_h, bg="grey")
         self.camera_canvas.pack(side='top',pady=(20, 0), expand=True)
 
@@ -95,6 +95,8 @@ class GUI(Frame):
         self.after_id = self.parent.after(200, self.start_camera)
 
     def recognition_process(self, frame):
+        height, width, _ = frame.shape
+        frame = cv2.resize(frame, (width // 2, height // 2))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.core.score_frame(frame)
         frame = self.core.plot_boxes(results, frame)
