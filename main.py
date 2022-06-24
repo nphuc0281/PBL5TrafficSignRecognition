@@ -39,7 +39,7 @@ class GUI(Frame):
 
         # Window
         self.parent.title("Traffic Sign Recognition")
-        self.parent.geometry("800x1000")
+        self.parent.geometry("400x500")
 
         # Camera view
         canvas_w = self.core.camera.get(cv2.CAP_PROP_FRAME_WIDTH) // 2
