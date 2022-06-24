@@ -39,11 +39,11 @@ class GUI(Frame):
 
         # Window
         self.parent.title("Traffic Sign Recognition")
-        self.parent.geometry("400x500")
+        self.parent.geometry("800x1000")
 
         # Camera view
-        canvas_w = self.core.camera.get(cv2.CAP_PROP_FRAME_WIDTH) // 2
-        canvas_h = self.core.camera.get(cv2.CAP_PROP_FRAME_HEIGHT) // 2
+        canvas_w = self.core.camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+        canvas_h = self.core.camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
         self.camera_canvas = Canvas(self.parent, width=canvas_w, height=canvas_h, bg="grey")
         self.camera_canvas.pack(side='top',pady=(20, 0), expand=True)
 
@@ -56,7 +56,7 @@ class GUI(Frame):
         self.button_stop.pack(side='right', anchor='w', expand=True, pady=(0, 20))
 
         # Label
-        self.lblResults = Label(windows, text="Không phát hiện biển báo", foreground='red')
+        self.lblResults = Label(windows, text="Không phát hiện biển báo", foreground='red', font=("Arial", 36))
         self.lblResults.pack(side='bottom', anchor='s', expand=True, pady=(0, 20))
 
     def start_camera(self):
@@ -76,7 +76,9 @@ class GUI(Frame):
             label = '\n'.join(labels)
             if self.lblResults['text'] != label:
                 for i in range(len(label_keys)):
-                    self.speech(label_keys[i])
+                    pool = ThreadPool(processes=1)
+                    async_result = pool.apply_async(self.recognition_process, (label_keys[i],))  # tuple of args for foo
+                    frame, results = async_result.get()
         elif len(labels) == 1:
             label = labels[0]
             if self.lblResults['text'] != label:
@@ -90,19 +92,12 @@ class GUI(Frame):
         # Show camera
         self.camera_image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
         self.camera_canvas.create_image(0, 0, image=self.camera_image, anchor=tkinter.NW)
-        self.after_id = self.parent.after(15, self.start_camera)
+        self.after_id = self.parent.after(200, self.start_camera)
 
     def recognition_process(self, frame):
-        start_time = time()
-        height, width, _ = frame.shape
-        frame = cv2.resize(frame, (width // 2, height // 2))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.core.score_frame(frame)
         frame = self.core.plot_boxes(results, frame)
-        end_time = time()
-        fps = 1 / np.round(end_time - start_time, 3)
-        print(f"Frames Per Second : {fps}")
-        print(end_time - start_time)
         return frame, results
 
     def stop_camera(self):

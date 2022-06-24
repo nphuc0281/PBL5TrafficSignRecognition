@@ -13,7 +13,6 @@ class Camera:
 
     @staticmethod
     def gstreamer_pipeline(
-            self,
             capture_width=1920,
             capture_height=1080,
             display_width=1920,
