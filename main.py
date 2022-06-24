@@ -45,7 +45,7 @@ class GUI(Frame):
         canvas_w = self.core.camera.get(cv2.CAP_PROP_FRAME_WIDTH) // 2
         canvas_h = self.core.camera.get(cv2.CAP_PROP_FRAME_HEIGHT) // 2
         self.camera_canvas = Canvas(self.parent, width=canvas_w, height=canvas_h, bg="grey")
-        self.camera_canvas.pack(side='top',pady=(20, 0), expand=True)
+        self.camera_canvas.pack(side='top', pady=(20, 0), expand=True)
 
         # Button start camera
         self.button_start = Button(windows, text="Start", command=self.start_camera)
@@ -56,7 +56,7 @@ class GUI(Frame):
         self.button_stop.pack(side='right', anchor='w', expand=True, pady=(0, 20))
 
         # Label
-        self.lblResults = Label(windows, text="Không phát hiện biển báo", foreground='red', font=("Arial", 36))
+        self.lblResults = Label(windows, text="Không phát hiện biển báo", foreground='red', font=("Arial", 20))
         self.lblResults.pack(side='bottom', anchor='s', expand=True, pady=(0, 20))
 
     def start_camera(self):
@@ -103,7 +103,7 @@ class GUI(Frame):
             self.parent.after_cancel(self.after_id)
             self.camera_canvas.delete("all")
 
-    def speech(self):
+    def speech(self, key):
         if not os.path.exists("sounds/"+key+".mp3"):
             tts = gTTS(self.ts_labels[key], tld="com.vn", lang="vi")
             tts.save("%s.mp3" % os.path.join("sounds", key))
