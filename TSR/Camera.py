@@ -3,9 +3,9 @@ import cv2
 
 class Camera:
     def __init__(self, mode=None):
-        if mode:
+        if mode == 0:
             self.cam = cv2.VideoCapture(0)
-        else:
+        elif mode == 1:
             self.cam = cv2.VideoCapture(self.gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 
     def __del__(self):

@@ -4,11 +4,9 @@ from .Camera import Camera
 
 
 class TrafficSignDetection:
-    def __init__(self, out_file, path_to_weight, cam_mode=None):
+    def __init__(self, path_to_weight, cam_mode=None):
         self.model = self.load_model(path_to_weight)
         self.classes = self.model.names
-        print(self.classes)
-        self.out_file = out_file
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.cam = Camera(cam_mode)
         self.camera = self.cam.cam
