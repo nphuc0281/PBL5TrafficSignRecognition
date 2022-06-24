@@ -82,6 +82,9 @@ class GUI(Frame):
             label = labels[0]
             if self.lblResults['text'] != label:
                 self.speech(label_keys[0])
+        else:
+            label = 'Không phát hiện biển báo'
+
         self.lblResults['text'] = label
 
         # Show camera
@@ -100,17 +103,11 @@ class GUI(Frame):
             self.parent.after_cancel(self.after_id)
             self.camera_canvas.delete("all")
 
-    def speech(self, key=None):
-        if key:
-            if not os.path.exists("sounds/"+key+".mp3"):
-                tts = gTTS(self.ts_labels[key], tld="com.vn", lang="vi")
-                tts.save("%s.mp3" % os.path.join("sounds", key))
-            playsound("sounds/"+key+".mp3")
-        else:
-            if not os.path.exists("sounds/default.mp3"):
-                tts = gTTS('Không phát hiện biển báo', tld="com.vn", lang="vi")
-                tts.save("%s.mp3" % os.path.join("sounds", "default"))
-            playsound("sounds/default.mp3")
+    def speech(self):
+        if not os.path.exists("sounds/"+key+".mp3"):
+            tts = gTTS(self.ts_labels[key], tld="com.vn", lang="vi")
+            tts.save("%s.mp3" % os.path.join("sounds", key))
+        playsound("sounds/"+key+".mp3")
 
 
 # Start app GUI
