@@ -82,10 +82,6 @@ class GUI(Frame):
             label = labels[0]
             if self.lblResults['text'] != label:
                 self.speech(label_keys[0])
-        else:
-            label = 'Không phát hiện biển báo'
-            if self.lblResults['text'] != label:
-                self.speech()
         self.lblResults['text'] = label
 
         # Show camera
