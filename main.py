@@ -7,6 +7,7 @@ import PIL.Image
 import PIL.ImageTk
 from playsound import playsound
 from multiprocessing.pool import ThreadPool
+from threading import Thread
 # from gtts import gTTS
 # import os
 
@@ -15,7 +16,7 @@ class GUI(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.parent = parent
-        self.core = TrafficSignDetection(path_to_weight='./models/TSR.pt', cam_mode=0)  # 0 for pc, 1 for jetson nano
+        self.core = TrafficSignDetection(path_to_weight='./models/TSR.pt', cam_mode=1)  # 0 for pc, 1 for jetson nano
 
         # Variables
         self.camera_image = None
@@ -38,7 +39,6 @@ class GUI(Frame):
         # Window
         self.parent.title("Traffic Sign Recognition")
         self.parent.geometry("1300x800")
-        self.parent.state('zoomed')
 
         # Camera view
         canvas_w = self.core.camera.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -63,7 +63,7 @@ class GUI(Frame):
         _, frame = self.core.camera.read()
 
         # Processing frame with YOLOv5 model and labeling
-        pool = ThreadPool(processes=4)
+        pool = ThreadPool(processes=1)
         async_result = pool.apply_async(self.recognition_process, (frame,))
         frame, label_keys = async_result.get()
 
@@ -73,11 +73,15 @@ class GUI(Frame):
         if len(labels) > 1:
             label = '\n'.join(labels)
             if self.lblResults['text'] != label:
-                self.speech(keys=label_keys)
+                thread = Thread(target=self.speech, args=(False, label_keys))
+                thread.daemon = True
+                thread.start()
         elif len(labels) == 1:
             label = labels[0]
             if self.lblResults['text'] != label:
-                self.speech(key=label_keys[0])
+                thread = Thread(target=self.speech, args=(label_keys[0], False))
+                thread.daemon = True
+                thread.start()
         else:
             label = 'Không phát hiện biển báo'
 
@@ -86,7 +90,7 @@ class GUI(Frame):
         # Show camera
         self.camera_image = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
         self.camera_canvas.create_image(0, 0, image=self.camera_image, anchor=tkinter.NW)
-        self.after_id = self.parent.after(10, self.start_camera)
+        self.after_id = self.parent.after(150, self.start_camera)
 
     def recognition_process(self, frame):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -106,12 +110,12 @@ class GUI(Frame):
                 # if not os.path.exists("sounds/"+k+".mp3"):
                 #     tts = gTTS(self.ts_labels[k], tld="com.vn", lang="vi")
                 #     tts.save("%s.mp3" % os.path.join("sounds", k))
-                playsound("sounds/"+k+".mp3", block=False)
-        else:
+                playsound("sounds/"+k+".mp3")
+        elif key:
             # if not os.path.exists("sounds/" + key + ".mp3"):
             #     tts = gTTS(self.ts_labels[key], tld="com.vn", lang="vi")
             #     tts.save("%s.mp3" % os.path.join("sounds", key))
-            playsound("sounds/" + key + ".mp3", block=False)
+            playsound("sounds/" + key + ".mp3")
 
 
 # Start app GUI
