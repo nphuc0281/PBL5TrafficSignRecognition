@@ -110,12 +110,12 @@ class GUI(Frame):
                 # if not os.path.exists("sounds/"+k+".mp3"):
                 #     tts = gTTS(self.ts_labels[k], tld="com.vn", lang="vi")
                 #     tts.save("%s.mp3" % os.path.join("sounds", k))
-                playsound("sounds/"+k+".mp3")
+                playsound("sounds/"+k+".mp3", block=True)
         elif key:
             # if not os.path.exists("sounds/" + key + ".mp3"):
             #     tts = gTTS(self.ts_labels[key], tld="com.vn", lang="vi")
             #     tts.save("%s.mp3" % os.path.join("sounds", key))
-            playsound("sounds/" + key + ".mp3")
+            playsound("sounds/" + key + ".mp3", block=True)
 
 
 # Start app GUI
