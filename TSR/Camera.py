@@ -7,6 +7,7 @@ class Camera:
             self.cam = cv2.VideoCapture(0)
         elif mode == 1:
             self.cam = cv2.VideoCapture(self.gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
+        self.cam.set(cv2.CAP_PROP_FPS, 10)
 
     def __del__(self):
         self.cam.release()
