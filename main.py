@@ -132,14 +132,14 @@ class GUI:
             self.camera_canvas.create_image(0, 0, image=self.camera_image, anchor=tkinter.NW)
 
         print('RefreshData...')
-        self.after_id = self.root.after(100, self.refresh_data)
+        self.after_id = self.root.after(200, self.refresh_data)
 
     def do_asyncio(self):
         # create thread object
         self.thread = AsyncioThread(self.the_queue, self.max_data, self.core, self.loop)
 
         # Timer to refresh data
-        self.after_id = self.root.after(100, self.refresh_data)
+        self.after_id = self.root.after(200, self.refresh_data)
 
         # start the thread
         self.thread.start()
